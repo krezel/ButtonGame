@@ -4,12 +4,16 @@ import android.graphics.*
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.SystemClock
 import android.widget.Button
 import android.widget.Chronometer
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.sql.Time
 import kotlin.time.Duration.Companion.seconds
 
@@ -31,23 +35,43 @@ class MainActivity : AppCompatActivity() {
         val timer = findViewById<Chronometer>(R.id.timer)
         val tvPoints = findViewById<TextView>(R.id.tv_points)
         val btnList = listOf(btn1,btn2,btn3,btn4,btn5,btn6,btn7,btn8,btn9)
+        val stopwatch = object : CountDownTimer(20000,1000){
+            override fun onTick(remaining: Long) {
+                ClickedButton().btnSwitch(btnList.random(), tvPoints)
+            }
+
+            override fun onFinish() {
+                timer.stop()
+            }
+        }
         btnStart.setOnClickListener {
-            ClickedButton().btnSwitch(btnList.random())
             setTimer(timer)
+            stopwatch.start()
         }
     }
     class ClickedButton(){
         private var isPoint = true
+        var points = 0
         @RequiresApi(Build.VERSION_CODES.Q)
-        fun btnSwitch(btn: ImageButton): Boolean {
+        fun btnSwitch(btn: ImageButton, tvpoints:TextView){
             btn.background.colorFilter = BlendModeColorFilter(Color.parseColor("#fc0328"),BlendMode.COLOR)
             isPoint = true
-            btn.background.clearColorFilter()
-            return isPoint
+            GlobalScope.launch {
+            delay(700L)
+                btn.background.clearColorFilter()
+                isPoint = false
+            }
+            GlobalScope.launch {
+                btn.setOnClickListener {
+                    if(isPoint)
+                        points++
+                    tvpoints.text = points.toString()
+                }
+            }
         }
     }
     private fun setTimer(clock:Chronometer){
-        clock.base = SystemClock.elapsedRealtime()+30000
-        clock.start()
+            clock.base = SystemClock.elapsedRealtime() + 20000
+            clock.start()
     }
 }
