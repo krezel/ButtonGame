@@ -18,6 +18,9 @@ import java.sql.Time
 import kotlin.time.Duration.Companion.seconds
 
 class MainActivity : AppCompatActivity() {
+        object Point {
+            var points = 0
+        }
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,20 +41,23 @@ class MainActivity : AppCompatActivity() {
         val stopwatch = object : CountDownTimer(20000,1000){
             override fun onTick(remaining: Long) {
                 ClickedButton().btnSwitch(btnList.random(), tvPoints)
+                btnStart.isClickable = false
             }
 
             override fun onFinish() {
                 timer.stop()
+                btnStart.isClickable = true
             }
         }
         btnStart.setOnClickListener {
             setTimer(timer)
             stopwatch.start()
+            Point.points = 0
+            tvPoints.text = Point.points.toString()
         }
     }
-    class ClickedButton(){
+    class ClickedButton {
         private var isPoint = true
-        var points = 0
         @RequiresApi(Build.VERSION_CODES.Q)
         fun btnSwitch(btn: ImageButton, tvpoints:TextView){
             btn.background.colorFilter = BlendModeColorFilter(Color.parseColor("#fc0328"),BlendMode.COLOR)
@@ -64,8 +70,8 @@ class MainActivity : AppCompatActivity() {
             GlobalScope.launch {
                 btn.setOnClickListener {
                     if(isPoint)
-                        points++
-                    tvpoints.text = points.toString()
+                        Point.points++
+                    tvpoints.text = Point.points.toString()
                 }
             }
         }
