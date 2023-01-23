@@ -11,11 +11,14 @@ import android.widget.Chronometer
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.RequiresApi
+import androidx.lifecycle.LifecycleCoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.sql.Time
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class MainActivity : AppCompatActivity() {
         object Point {
@@ -60,20 +63,19 @@ class MainActivity : AppCompatActivity() {
         private var isPoint = true
         @RequiresApi(Build.VERSION_CODES.Q)
         fun btnSwitch(btn: ImageButton, tvpoints:TextView){
+            val secs = (400..760).random().toDuration(DurationUnit.MILLISECONDS)
             btn.background.colorFilter = BlendModeColorFilter(Color.parseColor("#fc0328"),BlendMode.COLOR)
             isPoint = true
             GlobalScope.launch {
-            delay(700L)
+            delay(secs)
                 btn.background.clearColorFilter()
                 isPoint = false
             }
-            GlobalScope.launch {
                 btn.setOnClickListener {
                     if(isPoint)
                         Point.points++
                     tvpoints.text = Point.points.toString()
                 }
-            }
         }
     }
     private fun setTimer(clock:Chronometer){
